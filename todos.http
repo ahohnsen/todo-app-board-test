@@ -48,3 +48,5 @@ GET {{host}}/api/greeting?name=Jane
 ### echo
 GET {{host}}/api/echo
 
+### deeply nested path variables
+GET {{host}}/api/foo/fancy-foo/bar/beautiful-bar
