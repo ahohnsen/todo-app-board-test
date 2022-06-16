@@ -1,4 +1,4 @@
-@host = https://vercel-todo-one.vercel.app
+@host = http://localhost:3000
 @todoid = 62aaee8b4600b98bf567f7aa
 
 ### get all todos
@@ -39,3 +39,12 @@ Content-Type: application/json
 ### not found
 GET {{host}}/api/this-does-not-exist
 
+### greeting ohne name
+GET {{host}}/api/greeting
+
+### greeting mit name
+GET {{host}}/api/greeting?name=Jane
+
+### echo
+GET {{host}}/api/echo?name=Jane
+Content-Type: application/json
