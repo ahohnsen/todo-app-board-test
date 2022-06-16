@@ -46,5 +46,5 @@ GET {{host}}/api/greeting
 GET {{host}}/api/greeting?name=Jane
 
 ### echo
-GET {{host}}/api/echo?name=Jane
-Content-Type: application/json
+GET {{host}}/api/echo
+
