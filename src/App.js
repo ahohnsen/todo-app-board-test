@@ -2,6 +2,7 @@ import { nanoid } from 'nanoid'
 import { useState } from 'react'
 import styled from 'styled-components'
 import TodoForm from './components/TodoForm.js'
+import TodoItem from './components/TodoItem.js'
 
 function App() {
   const [todos, setTodos] = useState([])
@@ -9,16 +10,31 @@ function App() {
   return (
     <Grid>
       <TodoList>
-        {todos.map(todo => (
-          <li key={todo.id}>{todo.text}</li>
+        {todos.map((todo, index) => (
+          <TodoItem
+            key={todo.id}
+            text={todo.text}
+            id={todo.id}
+            isDone={todo.isDone}
+            onToggle={() => toggleTodo(index)}
+          />
         ))}
       </TodoList>
-      <TodoForm onCreateTodo={handleNewTodo} />
+      <TodoForm onCreateTodo={addTodo} />
     </Grid>
   )
 
-  function handleNewTodo(text) {
-    setTodos([...todos, { text, id: nanoid() }])
+  function addTodo(text) {
+    setTodos([...todos, { text, id: nanoid(), isDone: false }])
+  }
+
+  function toggleTodo(index) {
+    const todo = todos[index]
+    setTodos([
+      ...todos.slice(0, index),
+      { ...todo, isDone: !todo.isDone },
+      ...todos.slice(index + 1),
+    ])
   }
 }
 

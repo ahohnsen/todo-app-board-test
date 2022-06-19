@@ -1,15 +1,11 @@
-import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import ScreenReaderOnly from './ScreenReaderOnly.js'
 
-TodoForm.propTypes = {
-  onCreateTodo: PropTypes.func,
-}
 export default function TodoForm({ onCreateTodo, color }) {
   return (
     <Form onSubmit={handleSubmit} aria-labelledby="form-button">
       <Label htmlFor="todo-input">Describe your todo</Label>
-      <Input type="text" id="todo-input" name="todo" />
+      <Input autoComplete="off" type="text" id="todo-input" name="todo" />
       <Button>
         <ScreenReaderOnly>Create a new todo</ScreenReaderOnly>
         <span aria-hidden>+</span>
