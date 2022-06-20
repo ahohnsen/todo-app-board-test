@@ -38,15 +38,3 @@ Content-Type: application/json
 
 ### not found
 GET {{host}}/api/this-does-not-exist
-
-### greeting ohne name
-GET {{host}}/api/greeting
-
-### greeting mit name
-GET {{host}}/api/greeting?name=Jane
-
-### echo
-GET {{host}}/api/echo
-
-### deeply nested path variables
-GET {{host}}/api/foo/pommes/bar/currywurst

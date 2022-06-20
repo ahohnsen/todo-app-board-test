@@ -8,7 +8,6 @@ export default function TodoItem({ text, isDone, id, onToggle }) {
         checked={isDone}
         id={id}
         type="checkbox"
-        name="checkbox"
       />
       <label htmlFor={id}>{text}</label>
     </Item>

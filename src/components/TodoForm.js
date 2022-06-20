@@ -1,12 +1,12 @@
 import styled from 'styled-components'
 import ScreenReaderOnly from './ScreenReaderOnly.js'
 
-export default function TodoForm({ onCreateTodo, color }) {
+export default function TodoForm({ onCreateTodo }) {
   return (
     <Form onSubmit={handleSubmit} aria-labelledby="form-button">
       <Label htmlFor="todo-input">Describe your todo</Label>
       <Input autoComplete="off" type="text" id="todo-input" name="todo" />
-      <Button>
+      <Button id="form-button">
         <ScreenReaderOnly>Create a new todo</ScreenReaderOnly>
         <span aria-hidden>+</span>
       </Button>

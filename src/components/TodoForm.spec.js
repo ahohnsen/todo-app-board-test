@@ -5,8 +5,8 @@ import TodoForm from './TodoForm.js'
 describe('TodoForm', () => {
   it('renders an accessible form', async () => {
     render(<TodoForm />)
-    await screen.findByLabelText('todo', { exact: false })
     await screen.findByRole('form')
+    await screen.findByLabelText(/describe/i)
     await screen.findByRole('button', { name: /create/i })
   })
 

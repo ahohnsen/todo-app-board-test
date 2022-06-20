@@ -1,18 +1,26 @@
-const enclosingHandler = (request,response) => {
+import connectToMongodb from '../../src/backend/db/connect-to-mongodb'
+import Todo from '../../src/backend/model/Todo'
 
-    const {method} = request
+const enclosingHandler = async (request, response) => {
+  try {
+    await connectToMongodb()
 
-    if(method === "GET") {
-        // TODO: find all todos
-        return response.status(200).send("handling get /todos")
+    const { method } = request
+
+    if (method === 'GET') {
+      const allTodos = await Todo.find()
+      return response.status(200).json(allTodos)
     }
 
-    if(method === "POST") {
-        // TODO: create a new todo from request body
-        return response.status(200).send("handling post /todos")
+    if (method === 'POST') {
+      const newTodo = await Todo.create(request.body)
+      return response.status(200).json(newTodo)
     }
+  } catch (error) {
+    return response.status(400).json(error)
+  }
 
-    response.status(405).send()
+  response.status(405).send()
 }
 
 export default enclosingHandler
