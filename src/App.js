@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import useSWR from 'swr'
 import TodoForm from './components/TodoForm.js'
@@ -7,42 +6,38 @@ import TodoItem from './components/TodoItem.js'
 const fetcher = (...args) => fetch(...args).then(res => res.json())
 
 function App() {
-  // const [todos, setTodos] = useState([])
+  const {
+    data: todos,
+    error,
+    isValidating: loading,
+  } = useSWR('/api/todos', fetcher)
 
-  const { data: todos, error, isValidating } = useSWR('/api/todos', fetcher)
-
-  // useEffect(() => {
-  //   fetch('/api/todos')
-  //     .then(response => {
-  //       if (!response.ok) {
-  //         throw new Error('Not okay on GET todos')
-  //       }
-  //       return response.json()
-  //     })
-  //     .then(todos => setTodos(todos))
-  //     .catch(error => console.log(error))
-  // }, [])
+  function TodoState() {
+    if (loading) return <div>... Loading ...</div>
+    if (error) return <div>Error!</div>
+    if (todos.length) {
+      return (
+        <TodoList>
+          {JSON.stringify(todos)}
+          {todos?.map((todo, index) => (
+            <TodoItem
+              key={todo._id}
+              text={todo.description}
+              id={todo._id}
+              isDone={todo.done}
+              onToggle={() => toggleTodo(index)}
+            />
+          ))}
+        </TodoList>
+      )
+    }
+    return <div>No todos</div>
+  }
 
   return (
     <>
       <Grid>
-        {isValidating && '... Loading ...'}
-        {!error && !todos && 'No data'}
-        {!error && todos ? (
-          <TodoList>
-            {todos?.map((todo, index) => (
-              <TodoItem
-                key={todo._id}
-                text={todo.description}
-                id={todo._id}
-                isDone={todo.done}
-                onToggle={() => toggleTodo(index)}
-              />
-            ))}
-          </TodoList>
-        ) : (
-          'No todos'
-        )}
+        <TodoState />
         <TodoForm onCreateTodo={addTodo} />
       </Grid>
     </>
