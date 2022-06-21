@@ -3,84 +3,97 @@ import useSWR from 'swr'
 import TodoForm from './components/TodoForm.js'
 import TodoItem from './components/TodoItem.js'
 
-const fetcher = (...args) => fetch(...args).then(res => res.json())
+const fetcher = (...args) =>
+  fetch(...args).then(response => {
+    if (!response.ok) {
+      throw new Error('An error occured while fetching the data.')
+    }
+    return response.json()
+  })
 
 function App() {
   const {
     data: todos,
     error,
-    isValidating: loading,
-  } = useSWR('/api/todos', fetcher)
+    mutate,
+  } = useSWR('/api/todos', fetcher, { refreshInterval: 1000 })
 
-  function TodoState() {
-    if (loading) return <div>... Loading ...</div>
-    if (error) return <div>Error!</div>
-    if (todos.length) {
-      return (
-        <TodoList>
-          {JSON.stringify(todos)}
-          {todos?.map((todo, index) => (
-            <TodoItem
-              key={todo._id}
-              text={todo.description}
-              id={todo._id}
-              isDone={todo.done}
-              onToggle={() => toggleTodo(index)}
-            />
-          ))}
-        </TodoList>
-      )
-    }
-    return <div>No todos</div>
-  }
+  // function TodoState() {
+  //   if (!error && !todos) return <div>... Loading ...</div>
+  //   if (error) return <div>Error!</div>
+  //   return (
+  //     <TodoList>
+  //       {todos
+  //         ? todos?.map((todo, index) => (
+  //             <TodoItem
+  //               key={todo._id || todo.tempId}
+  //               text={todo.description}
+  //               id={todo._id}
+  //               isDone={todo.done}
+  //               onToggle={() => toggleTodo(index)}
+  //             />
+  //           ))
+  //         : '...loading...'}
+  //     </TodoList>
+  //   )
+  // }
+
+  if (error) return <p>Error</p>
+  if (!todos && !error) return <p> ... loading ...</p>
 
   return (
     <>
       <Grid>
-        <TodoState />
+        {todos.length === 0 && <div>Please start adding todos</div>}
+        <TodoList>
+          {todos &&
+            todos.map((todo, index) => (
+              <TodoItem
+                key={todo._id ?? todo.tempId}
+                text={todo.description}
+                id={todo._id}
+                isDone={todo.done}
+                onToggle={() => toggleTodo(index)}
+              />
+            ))}
+        </TodoList>
         <TodoForm onCreateTodo={addTodo} />
       </Grid>
     </>
   )
 
-  function addTodo(text) {
-    // fetch('/api/todos', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ description: text }),
-    // })
-    //   .then(response => {
-    //     if (!response.ok) throw new Error('POST todo not ok')
-    //     return response.json()
-    //   })
-    //   .then(todo => setTodos([...todos, todo]))
-    //   .catch(error => console.log(error))
+  async function addTodo(text) {
+    const todo = { tempId: Math.random(), description: text, done: false }
+
+    mutate([...todos, todo], false)
+    await fetcher('/api/todos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ description: text }),
+    })
+    mutate()
   }
 
-  function toggleTodo(index) {
+  async function toggleTodo(index) {
     const todo = todos[index]
-
-    // fetch('/api/todos/' + todo._id, {
-    //   method: 'PATCH',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ done: !todo.done }),
-    // })
-    //   .then(response => {
-    //     if (!response.ok) throw new Error('PATCH todo not ok')
-    //     return response.json()
-    //   })
-    //   .then(todo => {
-    //     setTodos([
-    //       ...todos.slice(0, index),
-    //       { ...todo, done: todo.done },
-    //       ...todos.slice(index + 1),
-    //     ])
-    //   })
-    //   .catch(error => console.log(error))
+    mutate(
+      [
+        ...todos.slice(0, index),
+        { ...todo, done: !todo.done },
+        ...todos.slice(index + 1),
+      ],
+      false
+    )
+    await fetcher('/api/todos/' + todo._id, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ done: !todo.done }),
+    })
+    mutate()
   }
 }
 
